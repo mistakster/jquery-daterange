@@ -2,6 +2,8 @@
 
 [Описание плагина по-русски](http://noteskeeper.ru/38/)
 
+[jQuery Plugins Repository page](http://plugins.jquery.com/daterange/)
+
 ## Overview
 
 Select range of dates is a common task for report pages or so. Unfortunately,

@@ -1,7 +1,7 @@
 {
 	"name": "daterange",
 	"title": "jQuery UI Daterange",
-	"description": "Add-on to jQuery UI Datepicker which allow user to select start and end date of range with two clicks",
+	"description": "Add-on to jQuery UI Datepicker which allow user to select start and end date of range in two clicks",
 	"keywords": [
 		"ui",
     "datepicker",
