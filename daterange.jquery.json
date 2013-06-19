@@ -1,0 +1,34 @@
+{
+	"name": "daterange",
+	"title": "jQuery UI Daterange",
+	"description": "Add-on to jQuery UI Datepicker which allow user to select start and end date of range with two clicks",
+	"keywords": [
+		"ui",
+    "datepicker",
+    "input",
+		"range"
+	],
+	"version": "1.0.0",
+	"author": {
+		"name": "Vladimir Kuznetsov",
+		"email": "mistakster@gmail.com",
+		"url": "https://github.com/mistakster"
+	},
+	"maintainers": [
+		{
+			"name": "Vladimir Kuznetsov",
+			"email": "mistakster@gmail.com",
+			"url": "https://github.com/mistakster"
+		}
+	],
+	"licenses": [
+		{
+			"url": "http://opensource.org/licenses/MIT"
+		}
+	],
+	"homepage": "http://noteskeeper.ru/38/",
+	"dependencies": {
+		"jquery": ">=1.6.0",
+    "jquery.ui": ">=1.9.0"
+	}
+}
