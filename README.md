@@ -4,6 +4,8 @@
 
 [jQuery Plugins Repository page](http://plugins.jquery.com/daterange/)
 
+[Demo page](http://mistakster.github.io/jquery-daterange/)
+
 ## Overview
 
 Select range of dates is a common task for report pages or so. Unfortunately,
