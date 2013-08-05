@@ -16,36 +16,43 @@
  */
 (function ($) {
 
-  $.fn.daterange = function () {
+  $.fn.daterange = function (opts) {
 
     // defaults
-    var opts = $.extend(
-      {
-        "dateFormat": "dd.mm.yy",
-        "changeMonth": false,
-        "changeYear": false,
-        "numberOfMonths": 2,
-        "rangeSeparator": " - "
-      },
-      arguments[0] || {},
-      {
-        // datepicker's select date event handler
-        "onSelect": function (dateText, inst) {
-          var textStart;
-            if (!inst.rangeStart) {
-              inst.inline = true;
-              inst.rangeStart = dateText;
-            } else {
-              inst.inline = false;
-              textStart = inst.rangeStart;
-              if (textStart !== dateText) {
-                $(this).val(textStart + opts.rangeSeparator + dateText);
-                inst.rangeStart = null;
-              }
-            }
+    opts = $.extend({
+      "changeMonth": false,
+      "changeYear": false,
+      "numberOfMonths": 2,
+      "rangeSeparator": " - "
+    }, opts || {});
+
+    var onSelect = opts.onSelect || $.noop;
+    var onClose = opts.onClose || $.noop;
+
+    // datepicker's select date event handler
+    opts.onSelect = function (dateText, inst) {
+      var textStart;
+      if (!inst.rangeStart) {
+        inst.inline = true;
+        inst.rangeStart = dateText;
+      } else {
+        inst.inline = false;
+        textStart = inst.rangeStart;
+        if (textStart !== dateText) {
+          $(this).val(textStart + opts.rangeSeparator + dateText);
+          inst.rangeStart = null;
         }
       }
-    );
+      // call original callback for select event
+      onSelect.apply(this, arguments);
+    };
+
+    opts.onClose = function (dateText, inst) {
+      // reset inline state
+      inst.inline = false;
+      // call original callback for close event
+      onClose.apply(this, arguments);
+    };
 
     return this.each(function () {
       var input = $(this);
