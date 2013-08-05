@@ -16,6 +16,22 @@
  */
 (function ($) {
 
+  function compareDates(start, end, format) {
+    var temp, dateStart, dateEnd;
+
+    try {
+      dateStart = $.datepicker.parseDate(format, start);
+      dateEnd = $.datepicker.parseDate(format, end);
+      if (dateEnd < dateStart) {
+        temp = start;
+        start = end;
+        end = temp;
+      }
+    } catch (ex) {}
+
+    return { start: start, end: end };
+  }
+
   $.fn.daterange = function (opts) {
 
     // defaults
@@ -39,7 +55,9 @@
         inst.inline = false;
         textStart = inst.rangeStart;
         if (textStart !== dateText) {
-          $(this).val(textStart + opts.rangeSeparator + dateText);
+          var dateFormat = $(this).datepicker("option", "dateFormat");
+          var dateRange = compareDates(textStart, dateText, dateFormat);
+          $(this).val(dateRange.start + opts.rangeSeparator + dateRange.end);
           inst.rangeStart = null;
         }
       }
