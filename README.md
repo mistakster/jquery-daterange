@@ -14,10 +14,12 @@ jQuery UI Datepicker doesn’t have native ability to select dates in this way.
 But Datapicker has undocumented flag that force it not to close than user select something.
 In current version it called `inline` and can be altered in `onSelect` callback.
 
+Previously selected days will be highlighted next time by CSS class `ui-datepicker-range`
+on table cells.
+
 ## Options
 
-Plugin accept all Datepicker’s options except [onSelect](http://api.jqueryui.com/datepicker/#option-onSelect)
-which will be overwritten by plugin.
+Plugin accept all Datepicker’s options.
 
     $("#date").daterange({
     	dateFormat: "yy/mm/dd",
