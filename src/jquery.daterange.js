@@ -103,7 +103,8 @@
     };
 
     opts.onClose = function (dateText, inst) {
-      // reset inline state
+      // reset state
+      inst.rangeStart = null;
       inst.inline = false;
       // store dateText to highlight it latter
       var dateFormat = $(this).datepicker("option", "dateFormat");
