@@ -44,6 +44,43 @@
 
     var onSelect = opts.onSelect || $.noop;
     var onClose = opts.onClose || $.noop;
+    var beforeShowDay = opts.beforeShowDay;
+
+    var lastDateRange;
+
+    function storeLastDateRange(dateText, dateFormat) {
+      var start, end;
+      dateText = dateText.split(opts.rangeSeparator);
+      if (dateText.length > 0) {
+        start = $.datepicker.parseDate(dateFormat, dateText[0]);
+        if (dateText.length > 1) {
+          end = $.datepicker.parseDate(dateFormat, dateText[1]);
+        }
+        lastDateRange = {start: start, end: end};
+      } else {
+        lastDateRange = null;
+      }
+    }
+
+    opts.beforeShowDay = function (date) {
+
+      var out = [true, ""], extraOut;
+
+      if (lastDateRange && lastDateRange.start <= date) {
+        if (lastDateRange.end && date <= lastDateRange.end) {
+          out[1] = "ui-datepicker-range";
+        }
+      }
+
+      if (beforeShowDay) {
+        extraOut = beforeShowDay.apply(this, arguments);
+        out[0] = out[0] && extraOut[0];
+        out[1] = out[1] + " " + extraOut[1];
+        out[2] = extraOut[2];
+      }
+
+      return out;
+    };
 
     // datepicker's select date event handler
     opts.onSelect = function (dateText, inst) {
@@ -68,6 +105,9 @@
     opts.onClose = function (dateText, inst) {
       // reset inline state
       inst.inline = false;
+      // store dateText to highlight it latter
+      var dateFormat = $(this).datepicker("option", "dateFormat");
+      storeLastDateRange(dateText, dateFormat);
       // call original callback for close event
       onClose.apply(this, arguments);
     };

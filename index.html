@@ -14,11 +14,21 @@
             padding: 8px;
             font-size: 16px;
         }
+		.info code {
+			display: inline-block;
+			background: white;
+			padding: 0 2px;
+			border: 1px solid #ddd;
+			border-radius: 3px;
+		}
         .form__daterange {
             font-size: 16px;
             padding: 8px;
             width: 30em;
         }
+		.ui-datepicker-range > .ui-state-default {
+			background: lightsalmon;
+		}
     </style>
 </head>
 <body>
@@ -31,6 +41,9 @@
             First click selects start of range and second &mdash; the end.<br>
 			Also, plugin can automatically swap dates if needed.
         </p>
+		<p>
+			Previously selected days can be highlighted via class <code>.ui-datepicker-range</code><br>
+		</p>
     </div>
 
     <div class="form">
