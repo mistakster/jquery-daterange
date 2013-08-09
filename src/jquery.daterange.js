@@ -31,7 +31,7 @@
     return { start: start, end: end };
   }
 
-  $.fn.daterange = function (opts) {
+  $.fn._daterange = function (opts) {
 
     // defaults
     opts = $.extend({
@@ -119,5 +119,32 @@
       }
     });
   };
+
+  $.widget("ui.daterange", {
+    options: {
+      "changeMonth": false,
+      "changeYear": false,
+      "numberOfMonths": 2,
+      "rangeSeparator": " - "
+    },
+
+    _getCssClass: function (cls) {
+      return this.widgetFullName + "-" + cls;
+    },
+
+    _create: function () {
+      var that = this;
+      this.element
+        .addClass(this._getCssClass("ready"))
+        .datepicker(this.options);
+    },
+
+    destroy: function () {
+      this.element
+        .removeClass(this._getCssClass("ready"))
+        .datepicker("destroy");
+      this._destroy();
+    }
+  });
 
 }(jQuery));
