@@ -3,8 +3,7 @@
  * First click selects start date of range. Second click selects
  * end date of range and closes calendar.
  *
- * Plugin accept all Datepicker options except "onSelect" callback.
- * It will be overwritten by plugin. Also, plugin introduce one more
+ * Plugin accept all Datepicker options. Also, plugin introduce one more
  * option -- rangeSeparator.
  *
  * http://noteskeeper.ru/38/
