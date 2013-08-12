@@ -12,7 +12,7 @@ Select range of dates is a common task for report pages or so. Unfortunately,
 jQuery UI Datepicker doesn’t have native ability to select dates in this way.
 
 But Datapicker has undocumented flag that force it not to close than user select something.
-In current version it called `inline` and can be altered in `onSelect` callback.
+In current version (1.10.x) it called `inline` and can be altered in `onSelect` callback.
 
 Previously selected days will be highlighted next time by CSS class `ui-datepicker-range`
 on table cells.
