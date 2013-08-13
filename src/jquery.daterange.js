@@ -43,6 +43,7 @@
 
     var onSelect = opts.onSelect || $.noop;
     var onClose = opts.onClose || $.noop;
+    var beforeShow = opts.beforeShow || $.noop;
     var beforeShowDay = opts.beforeShowDay;
 
     var lastDateRange;
@@ -60,6 +61,13 @@
         lastDateRange = null;
       }
     }
+
+    opts.beforeShow = function (input, inst) {
+      // store dateText to highlight it latter
+      var dateFormat = $(this).datepicker("option", "dateFormat");
+      storeLastDateRange($(input).val(), dateFormat);
+      beforeShow.apply(this, arguments);
+    };
 
     opts.beforeShowDay = function (date) {
 
@@ -105,9 +113,6 @@
       // reset state
       inst.rangeStart = null;
       inst.inline = false;
-      // store dateText to highlight it latter
-      var dateFormat = $(this).datepicker("option", "dateFormat");
-      storeLastDateRange(dateText, dateFormat);
       // call original callback for close event
       onClose.apply(this, arguments);
     };
