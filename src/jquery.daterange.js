@@ -3,8 +3,9 @@
  * First click selects start date of range. Second click selects
  * end date of range and closes calendar.
  *
- * Plugin accept all Datepicker options. Also, plugin introduce one more
- * option -- rangeSeparator.
+ * Plugin accept all Datepicker options. Also, plugin introduce more options:
+ *   - rangeCssClass -- class that will be added to every cell of calendar, if date in range
+ *   - rangeSeparator -- string that split start and end dates of range
  *
  * http://noteskeeper.ru/38/
  *
@@ -15,141 +16,146 @@
  */
 (function ($) {
 
-  function compareDates(start, end, format) {
-    var temp, dateStart, dateEnd;
+	function getDateFormat($ele) {
+		return $ele.datepicker("option", "dateFormat");
+	}
 
-    try {
-      dateStart = $.datepicker.parseDate(format, start);
-      dateEnd = $.datepicker.parseDate(format, end);
-      if (dateEnd < dateStart) {
-        temp = start;
-        start = end;
-        end = temp;
-      }
-    } catch (ex) {}
+	var parseDate = $.proxy($.datepicker, "parseDate");
 
-    return { start: start, end: end };
-  }
+	function compareDates(start, end, format) {
+		var temp, dateStart, dateEnd;
 
-  $.fn._daterange = function (opts) {
+		try {
+			dateStart = parseDate(format, start);
+			dateEnd = parseDate(format, end);
+			if (dateEnd < dateStart) {
+				temp = start;
+				start = end;
+				end = temp;
+			}
+		} catch (ex) {}
 
-    // defaults
-    opts = $.extend({
-      "changeMonth": false,
-      "changeYear": false,
-      "numberOfMonths": 2,
-      "rangeSeparator": " - "
-    }, opts || {});
+		return { start: start, end: end };
+	}
 
-    var onSelect = opts.onSelect || $.noop;
-    var onClose = opts.onClose || $.noop;
-    var beforeShow = opts.beforeShow || $.noop;
-    var beforeShowDay = opts.beforeShowDay;
+	function storeLastDateRange(widget, dateText, dateFormat) {
+		var start, end, lastDateRange;
+		dateText = dateText.split(widget.options.rangeSeparator);
+		if (dateText.length > 0) {
+			start = parseDate(dateFormat, dateText[0]);
+			if (dateText.length > 1) {
+				end = parseDate(dateFormat, dateText[1]);
+			}
+			lastDateRange = {start: start, end: end};
+		} else {
+			lastDateRange = null;
+		}
+		widget._lastDateRange = lastDateRange;
+	}
 
-    var lastDateRange;
 
-    function storeLastDateRange(dateText, dateFormat) {
-      var start, end;
-      dateText = dateText.split(opts.rangeSeparator);
-      if (dateText.length > 0) {
-        start = $.datepicker.parseDate(dateFormat, dateText[0]);
-        if (dateText.length > 1) {
-          end = $.datepicker.parseDate(dateFormat, dateText[1]);
-        }
-        lastDateRange = {start: start, end: end};
-      } else {
-        lastDateRange = null;
-      }
-    }
+	function wrapCallback(widget, method) {
+		return function () {
+			var args = Array.prototype.slice.apply(arguments);
+			args.unshift(widget);
+			widget["_" + method].apply(this, args);
+			if (widget.options[method]) {
+				widget.options[method].apply(this, arguments);
+			}
+		}
+	}
 
-    opts.beforeShow = function (input, inst) {
-      // store dateText to highlight it latter
-      var dateFormat = $(this).datepicker("option", "dateFormat");
-      storeLastDateRange($(input).val(), dateFormat);
-      beforeShow.apply(this, arguments);
-    };
 
-    opts.beforeShowDay = function (date) {
+	$.widget("ui.daterange", {
+		options: {
+			"changeMonth": false,
+			"changeYear": false,
+			"numberOfMonths": 2,
+			"rangeCssClass": "ui-datepicker-range",
+			"rangeSeparator": " - "
+		},
 
-      var out = [true, ""], extraOut;
+		_getCssClass: function (cls) {
+			return this.widgetFullName + "-" + cls;
+		},
 
-      if (lastDateRange && lastDateRange.start <= date) {
-        if (lastDateRange.end && date <= lastDateRange.end) {
-          out[1] = "ui-datepicker-range";
-        }
-      }
+		_create: function () {
+			var that = this;
+			this.element.addClass(this._getCssClass("ready"));
 
-      if (beforeShowDay) {
-        extraOut = beforeShowDay.apply(this, arguments);
-        out[0] = out[0] && extraOut[0];
-        out[1] = out[1] + " " + extraOut[1];
-        out[2] = extraOut[2];
-      }
+			var dpOptions = $.extend({}, this.options, {
+				onClose: wrapCallback(that, "onClose"),
+				onSelect: wrapCallback(that, "onSelect"),
+				beforeShow: wrapCallback(that, "beforeShow"),
+				beforeShowDay: function (date) {
+					return that._beforeShowDay.call(this, that, date);
+				}
+			});
 
-      return out;
-    };
+			this.element.datepicker(dpOptions);
+		},
 
-    // datepicker's select date event handler
-    opts.onSelect = function (dateText, inst) {
-      var textStart;
-      if (!inst.rangeStart) {
-        inst.inline = true;
-        inst.rangeStart = dateText;
-      } else {
-        inst.inline = false;
-        textStart = inst.rangeStart;
-        if (textStart !== dateText) {
-          var dateFormat = $(this).datepicker("option", "dateFormat");
-          var dateRange = compareDates(textStart, dateText, dateFormat);
-          $(this).val(dateRange.start + opts.rangeSeparator + dateRange.end);
-          inst.rangeStart = null;
-        }
-      }
-      // call original callback for select event
-      onSelect.apply(this, arguments);
-    };
+		destroy: function () {
+			this.element
+				.removeClass(this._getCssClass("ready"))
+				.datepicker("destroy");
+			this._destroy();
+		},
 
-    opts.onClose = function (dateText, inst) {
-      // reset state
-      inst.rangeStart = null;
-      inst.inline = false;
-      // call original callback for close event
-      onClose.apply(this, arguments);
-    };
+		_onClose: function (widget, dateText, inst) {
+			// reset state
+			widget._rangeStart = null;
+			inst.inline = false;
+		},
 
-    return this.each(function () {
-      var input = $(this);
-      if (input.is("input")) {
-        input.datepicker(opts);
-      }
-    });
-  };
+		_onSelect: function (widget, dateText, inst) {
+			var textStart, $ele = $(this);
+			if (!widget._rangeStart) {
+				inst.inline = true;
+				widget._rangeStart = dateText;
+			} else {
+				inst.inline = false;
+				textStart = widget._rangeStart;
+				if (textStart !== dateText) {
+					var dateFormat = getDateFormat($ele);
+					var dateRange = compareDates(textStart, dateText, dateFormat);
+					$ele.val(dateRange.start + widget.options.rangeSeparator + dateRange.end);
+					widget._rangeStart = null;
+				}
+			}
+		},
 
-  $.widget("ui.daterange", {
-    options: {
-      "changeMonth": false,
-      "changeYear": false,
-      "numberOfMonths": 2,
-      "rangeSeparator": " - "
-    },
+		_beforeShow: function (widget, input, inst) {
+			// store date to highlight it latter
+			var $ele = $(this), dateFormat = getDateFormat($ele);
+			storeLastDateRange(widget, $ele.val(), dateFormat);
+		},
 
-    _getCssClass: function (cls) {
-      return this.widgetFullName + "-" + cls;
-    },
+		_beforeShowDay: function (widget, date, cb) {
+			var out = [true, ""], extraOut;
+			var start, end;
 
-    _create: function () {
-      var that = this;
-      this.element
-        .addClass(this._getCssClass("ready"))
-        .datepicker(this.options);
-    },
+			if (widget._lastDateRange) {
+				start = widget._lastDateRange.start;
+				end = widget._lastDateRange.end;
+				if (!end) {
+					end = start;
+				}
+			}
 
-    destroy: function () {
-      this.element
-        .removeClass(this._getCssClass("ready"))
-        .datepicker("destroy");
-      this._destroy();
-    }
-  });
+			if (start && start <= date && date <= end) {
+				out[1] = widget.options.rangeCssClass;
+			}
+
+			if (cb) {
+				extraOut = cb.call(this, date);
+				out[0] = out[0] && extraOut[0];
+				out[1] = out[1] + " " + extraOut[1];
+				out[2] = extraOut[2];
+			}
+
+			return out;
+		}
+	});
 
 }(jQuery));
