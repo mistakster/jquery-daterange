@@ -21,22 +21,25 @@ on table cells.
 
 Plugin accept all Datepicker’s options.
 
-    $("#date").daterange({
-    	dateFormat: "yy/mm/dd",
-    	onClose: function (dateRangeText) {
+	$("#date").daterange({
+		dateFormat: "yy/mm/dd",
+		onClose: function (dateRangeText) {
 			$("#date").after("<p>" + dateRangeText + "</p>");
-    	}
-    });
+		}
+	});
 
-Also plugin introduce one more option: **rangeSeparator**.
-This option cares about the string between first and last date.
+Also plugin introduce more options:
 
-    $("#date").daterange({
-    	rangeSeparator: " ### ",
-    	onClose: function (dateRangeText) {
+* **rangeSeparator** - this option cares about the string between first and last date;
+* **rangeCssClass** - class that will be added to every cell of calendar, if date in range.
+
+	$("#date").daterange({
+		rangeCssClass: "my-range",
+		rangeSeparator: " ### ",
+		onClose: function (dateRangeText) {
 			$("#date").after("<p>" + dateRangeText + "</p>");
-    	}
-    });
+		}
+	});
 
 ## License
 
